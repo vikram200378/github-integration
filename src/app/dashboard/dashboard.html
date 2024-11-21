@@ -7,30 +7,63 @@
             (opened)="togglePanelState(true)"
             (closed)="togglePanelState(false)"
           >
-            <mat-expansion-panel-header style="min-height: 70px">
+            <mat-expansion-panel-header class="panel-header">
               <mat-panel-title class="d-flex gap-2 align-items-center">
-                <git-icons [name]="'github'" [width]="'94px'" [height]="'100%'" />
-                <mat-icon style="color: green">check_circle</mat-icon>
-                <mat-icon>history</mat-icon>
+                <git-icons
+                  [name]="'github'"
+                  [width]="'94px'"
+                  [height]="'100%'"
+                />
+                <ng-container *ngIf="statusDetail && statusDetail.connected">
+                  <mat-icon style="color: green">check_circle</mat-icon>
+                  <mat-icon>history</mat-icon>
+                </ng-container>
               </mat-panel-title>
-              <mat-panel-description
-                style="
-                  text-align: end;
-                  justify-content: flex-end;
-                  padding-right: 2rem;
-                "
-              >
-                Admin: Last Synced: {{date | date:'YYYY-MM-DD hh:mm a'}} <br />
-                Sync Type: Full
-              </mat-panel-description>
+
+              <ng-container *ngIf="statusDetail?.connected">
+                <mat-panel-description class="panel-description">
+                  Admin: Last Synced: {{statusDetail.integration.connectedAt | date:'YYYY-MM-dd hh:mma'}} <br />
+                  Sync Type: Full
+                </mat-panel-description>
+              </ng-container>
             </mat-expansion-panel-header>
 
-            <div class="d-flex align-items-center justify-content-end pt-5">
-              <button mat-raised-button color="primary" class="d-flex align-items-center">
-                <span>Remove &nbsp;</span>
-                <git-icons [name]="'private'" [width]="'18px'" [height]="'18px'" />
-              </button>
-            </div>
+            <ng-container *ngIf="statusDetail.connected">
+              <div class="d-flex align-items-center justify-content-end pt-5">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="button"
+                  class="d-flex align-items-center"
+                  (click)="removeAccount()"
+                >
+                  <span>Remove &nbsp;</span>
+                  <git-icons
+                    [name]="'private'"
+                    [width]="'18px'"
+                    [height]="'18px'"
+                  />
+                </button>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="!statusDetail.connected">
+              <div
+                class="d-flex flex-column align-items-center justify-content-center pt-5"
+              >
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="button"
+                  (click)="connect()"
+                >
+                  Connect
+                </button>
+                <h1 class="mt-3 text-primary">
+                  <strong>Connect Sredio to Github</strong>
+                </h1>
+              </div>
+            </ng-container>
           </mat-expansion-panel>
         </mat-accordion>
       </div>
