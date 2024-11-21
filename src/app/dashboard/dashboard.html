@@ -1,0 +1,39 @@
+<section class="dashboard-wrapper">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12 col-md-12">
+        <mat-accordion>
+          <mat-expansion-panel
+            (opened)="togglePanelState(true)"
+            (closed)="togglePanelState(false)"
+          >
+            <mat-expansion-panel-header style="min-height: 70px">
+              <mat-panel-title class="d-flex gap-2 align-items-center">
+                <git-icons [name]="'github'" [width]="'94px'" [height]="'100%'" />
+                <mat-icon style="color: green">check_circle</mat-icon>
+                <mat-icon>history</mat-icon>
+              </mat-panel-title>
+              <mat-panel-description
+                style="
+                  text-align: end;
+                  justify-content: flex-end;
+                  padding-right: 2rem;
+                "
+              >
+                Admin: Last Synced: {{date | date:'YYYY-MM-DD hh:mm a'}} <br />
+                Sync Type: Full
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="d-flex align-items-center justify-content-end pt-5">
+              <button mat-raised-button color="primary" class="d-flex align-items-center">
+                <span>Remove &nbsp;</span>
+                <git-icons [name]="'private'" [width]="'18px'" [height]="'18px'" />
+              </button>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+    </div>
+  </div>
+</section>
