@@ -7,20 +7,19 @@ import { DashboardService, GitIcons } from 'src/shared';
 import { GithubStatusDetail } from 'src/shared/interfaces/github';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 @Component({
-  selector: 'git-dashboard',
-  templateUrl: './dashboard.html',
-  standalone: true,
-  imports: [
-    MatExpansionModule,
-    GitIcons,
-    MatIconModule,
-    DatePipe,
-    MatButtonModule,
-    NgIf,
-    MatSnackBarModule,
-  ],
-  styleUrls: ['./dashboard.scss'],
-  providers: [DashboardService],
+    selector: 'git-dashboard',
+    templateUrl: './dashboard.html',
+    imports: [
+        MatExpansionModule,
+        GitIcons,
+        MatIconModule,
+        DatePipe,
+        MatButtonModule,
+        NgIf,
+        MatSnackBarModule,
+    ],
+    styleUrls: ['./dashboard.scss'],
+    providers: [DashboardService]
 })
 export class DashboardComponent implements OnInit {
   private readonly _dashboardService = inject(DashboardService);
