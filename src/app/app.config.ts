@@ -1,11 +1,10 @@
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
-
 import { provideHttpClient } from '@angular/common/http';
-import { ApplicationConfig, BrowserModule } from '@angular/platform-browser';
+import { BrowserModule } from '@angular/platform-browser';
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 
 import route from './app.route';
-import { importProvidersFrom } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 export const appConfig: ApplicationConfig = {
   providers: [
