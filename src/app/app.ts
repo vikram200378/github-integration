@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 @Component({
     selector: 'git-root',
     template: `<router-outlet />`,
-    imports: [RouterModule]
+    imports: [RouterModule],
 })
 export class AppComponent {
   title = 'github-integration';
