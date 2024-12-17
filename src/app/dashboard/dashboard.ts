@@ -67,7 +67,6 @@ export class DashboardComponent implements OnInit {
             this.statusDetail.connected &&
             !this.isSyncComplete(res?.integration?.syncStatus)
           ) {
-            console.log('Strt interval');
             this.getStatus();
           }
         },
