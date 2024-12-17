@@ -32,14 +32,14 @@ export class GithubService {
     searchString?: string
   ): Observable<GithubData<T>> {
     const endpoint = searchString
-      ? `${environments.baseUrl}/search`
+      ? `${environments.baseUrl}/github/search`
       : `${environments.baseUrl}/github/${type}`;
 
     let httpParams = new HttpParams()
       ?.set('page', page || 1)
       ?.set('limit', limit || 10);
 
-    if (repoId) {
+    if (repoId && !searchString) {
       httpParams = httpParams.append('repoId', repoId);
     }
 

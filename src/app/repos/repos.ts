@@ -120,8 +120,11 @@ export class ReposComponent implements OnInit {
     this.filterForm?.controls?.currentView?.valueChanges
       ?.pipe(takeUntilDestroyed(this._destroyRef))
       ?.subscribe((res) => {
-        if (res && this.entityId?.value) {
-          return this.fetchData(res as GithubDataType);
+        if (res && (this.entityId?.value || this.filterForm?.value?.search)) {
+          return this.fetchData(
+            res as GithubDataType,
+            this.filterForm?.value?.search || ''
+          );
         }
       });
 
@@ -149,9 +152,16 @@ export class ReposComponent implements OnInit {
             this._renderCols(type);
           },
         }),
-        map((res) => {
+        map((res: any) => {
+          if (search) {
+            res = {
+              results: res?.[type]?.results,
+              pagination: res?.[type]?.pagination,
+            };
+          }
+
           if (res?.results?.length) {
-            res.results = res?.results?.map((data) => {
+            res.results = res?.results?.map((data: any) => {
               if (type == GithubDataType.commits) {
                 return {
                   commitId: data?.sha,
@@ -211,10 +221,13 @@ export class ReposComponent implements OnInit {
       ?.pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: (value) => {
-          this.filterForm?.controls?.currentView?.setValue(
-            GithubDataType?.commits,
-            { emitEvent: true }
-          );
+          if (value) {
+            this.filterForm?.controls?.search?.setValue('');
+            this.filterForm?.controls?.currentView?.setValue(
+              GithubDataType?.commits,
+              { emitEvent: true }
+            );
+          }
         },
       });
   }
@@ -231,7 +244,10 @@ export class ReposComponent implements OnInit {
   public handlePageEvent(e: PageEvent) {
     this.pagination.page = (e.pageIndex || 0) + 1;
     this.pagination.limit = e.pageSize || 10;
-    this.fetchData(this.filterForm?.value?.currentView as GithubDataType);
+    this.fetchData(
+      this.filterForm?.value?.currentView as GithubDataType,
+      this.filterForm?.value?.search || ''
+    );
   }
 
   // Entity Autocomplete events
