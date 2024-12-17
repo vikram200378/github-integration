@@ -2,8 +2,8 @@ import { NgStyle } from '@angular/common';
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'git-icons',
-  template: `
+    selector: 'git-icons',
+    template: `
     <img
       src="/assets/icons/{{ name }}.png"
       alt="github-icon"
@@ -11,8 +11,7 @@ import { Component, Input } from '@angular/core';
       style="object-fit: contain;"
     />
   `,
-  imports: [NgStyle],
-  standalone: true,
+    imports: [NgStyle]
 })
 export class GitIcons {
   @Input() name: string = '';

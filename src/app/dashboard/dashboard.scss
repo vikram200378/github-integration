@@ -1,7 +1,7 @@
 .dashboard-wrapper {
   width: 100%;
   min-height: 100vh;
-  background: #d3d3d3;
+  background: #ececec;
   padding-top: 1rem;
 }
 
@@ -10,11 +10,16 @@
 }
 
 .panel-header {
-    min-height: 70px;
+  min-height: 70px;
 }
 
 .panel-description {
   text-align: end;
   justify-content: flex-end;
   padding-right: 2rem;
+}
+
+.loader {
+  width: 25px !important; 
+  height: 25px !important; 
 }

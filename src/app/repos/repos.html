@@ -1,0 +1,84 @@
+<form [formGroup]="filterForm">
+  <div class="row">
+    <div class="col-12 col-md-4 form-field-container">
+      <label for="activeIntegration" class="field-label"
+        >Active Integration:</label
+      >
+      <mat-form-field [appearance]="'outline'">
+        <mat-select formControlName="activeIntegration">
+          <mat-option value="github">Github</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-12 col-md-4 form-field-container">
+      <label for="entity" class="field-label">Entity:</label>
+      <mat-form-field [appearance]="'outline'">
+        <mat-select formControlName="entity" (opened)="onAutocompleteOpened()">
+          <mat-option *ngFor="let entity of entityOptions" [value]="entity?.id">
+            {{ entity?.name }}
+          </mat-option>
+          <mat-option *ngIf="entityLoading" class="loading">
+            <mat-spinner diameter="20"></mat-spinner>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- List -->
+    <div class="col-12 col-md-3 form-field-container">
+      <label for="currentView" class="field-label">View:</label>
+      <mat-form-field [appearance]="'outline'">
+        <mat-select formControlName="currentView">
+          <mat-option value="commits">Commits</mat-option>
+          <mat-option value="pullRequests">Pull Requests</mat-option>
+          <mat-option value="issues">Issues</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12 col-md-4 form-field-container">
+      <label for="search" class="field-label">Search:</label>
+      <mat-form-field [appearance]="'outline'">
+        <input
+          matInput
+          type="text"
+          placeholder="Search"
+          formControlName="search"
+        />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+</form>
+
+@if(filterForm.controls.entity?.value) {
+<div class="wrapper">
+  <div [class]="themeClass" class="grid m-0">
+    <ag-grid-angular
+      style="height: 100%"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      [autoGroupColumnDef]="autoGroupColumnDef"
+      [loading]="dataLoading"
+    ></ag-grid-angular>
+  </div>
+</div>
+
+<mat-paginator
+  #paginator
+  class="ag-grid-paginator"
+  (page)="handlePageEvent($event)"
+  [length]="pagination.total"
+  [pageSize]="pagination.limit"
+  [disabled]="false"
+  [showFirstLastButtons]="true"
+  [pageSizeOptions]="[10, 20, 25, 50]"
+  [hidePageSize]="false"
+  [pageIndex]="pagination.page == 1 ? 0 : pagination.page - 1"
+  aria-label="Select page"
+>
+</mat-paginator>
+}
