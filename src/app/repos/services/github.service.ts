@@ -27,13 +27,25 @@ export class GithubService {
   public getRepos<T>(
     type: GithubDataType,
     page: number,
-    limit: number
+    limit: number,
+    repoId?: string,
+    searchString?: string
   ): Observable<GithubData<T>> {
-    const endpoint = `${environments.baseUrl}/api/github/${type}`;
+    const endpoint = searchString
+      ? `${environments.baseUrl}/search`
+      : `${environments.baseUrl}/github/${type}`;
 
-    const httpParams = new HttpParams()
+    let httpParams = new HttpParams()
       ?.set('page', page || 1)
       ?.set('limit', limit || 10);
+
+    if (repoId) {
+      httpParams = httpParams.append('repoId', repoId);
+    }
+
+    if (searchString) {
+      httpParams = httpParams.append('query', searchString || '');
+    }
 
     return this._genericClient.genericGet<GithubData<T>>(endpoint, {
       params: httpParams,
