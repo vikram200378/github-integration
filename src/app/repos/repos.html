@@ -15,7 +15,10 @@
       <label for="entity" class="field-label">Entity:</label>
       <mat-form-field [appearance]="'outline'">
         <mat-select formControlName="entity">
-          <mat-option value="projects">Projects</mat-option>
+          <mat-option value="repos">Repositories</mat-option>
+          <mat-option value="commits">Commits</mat-option>
+          <mat-option value="pullRequests">Pull Requests</mat-option>
+          <mat-option value="issues">Issues</mat-option>
         </mat-select>
       </mat-form-field>
     </div>
@@ -49,3 +52,18 @@
     ></ag-grid-angular>
   </div>
 </div>
+
+<mat-paginator
+  #paginator
+  class="ag-grid-paginator"
+  (page)="handlePageEvent($event)"
+  [length]="pagination.total"
+  [pageSize]="pagination.limit"
+  [disabled]="false"
+  [showFirstLastButtons]="true"
+  [pageSizeOptions]="[10, 20, 25, 50]"
+  [hidePageSize]="false"
+  [pageIndex]="pagination.page == 1 ? 0 : pagination.page - 1"
+  aria-label="Select page"
+>
+</mat-paginator>
