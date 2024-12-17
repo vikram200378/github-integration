@@ -1,7 +1,7 @@
 .dashboard-wrapper {
   width: 100%;
   min-height: 100vh;
-  background: #d3d3d3;
+  background: #ececec;
   padding-top: 1rem;
 }
 
@@ -17,4 +17,9 @@
   text-align: end;
   justify-content: flex-end;
   padding-right: 2rem;
+}
+
+.loader {
+  width: 25px !important; 
+  height: 25px !important; 
 }
