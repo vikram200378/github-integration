@@ -1,6 +1,6 @@
 import { HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { environments } from 'src/environments/environment';
 import { GithubData } from 'src/shared/interfaces';
 import { GenericClientService } from 'src/shared/services/generic';

@@ -22,11 +22,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Pagination } from 'src/shared/interfaces';
 import { debounceTime, finalize, map, of, switchMap, tap } from 'rxjs';
 import { NgFor, NgIf } from '@angular/common';
-
+import { MatDialog } from '@angular/material/dialog';
 import dayjs from 'dayjs';
 
+import { AuthorModalComponent } from './modal/author-modal.component';
 ModuleRegistry.registerModules([AllCommunityModule]);
+// import { MasterDetailModule } from 'ag-grid-enterprise';
 
+// ModuleRegistry.registerModules([MasterDetailModule]);
 @Component({
   selector: 'git-repos',
   templateUrl: './repos.html',
@@ -50,28 +53,24 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 export class ReposComponent implements OnInit {
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _githubService = inject(GithubService);
-
-  // Entity autocomplete
+  private readonly dialog = inject(MatDialog);
   public entityOptions: any[] = [];
   public entityLoading = false;
   public entityPage = 1;
   public entityTotalPages = 0;
-
-  // Filter form group
   public filterForm = new FormGroup({
     activeIntegration: new FormControl('github'),
     entity: new FormControl(''),
     currentView: new FormControl(GithubDataType.commits),
     search: new FormControl(''),
   });
-
-  // Row data
   public rowData: any[] = [];
-
-  // Ag grid theme
   public themeClass = 'ag-theme-quartz';
+  public detailCellRendererParams = {
+    suppressCount: true,
+    innerRenderer: EmployeeCellRenderer,
+  };
 
-  // Columns
   public autoGroupColumnDef: ColDef = {
     headerName: 'Repositories',
     width: 330,
@@ -83,17 +82,9 @@ export class ReposComponent implements OnInit {
       innerRenderer: EmployeeCellRenderer,
     },
   };
-
-  // Expand state
   public groupDefaultExpanded = -1;
-
-  // Tree Data
   public treeData = true;
-
-  // Data laoding
   public dataLoading = false;
-
-  // Table pagination
   public pagination: Pagination = {
     page: 1,
     limit: 10,
@@ -111,7 +102,7 @@ export class ReposComponent implements OnInit {
         this.entityOptions = [
           ...this.entityOptions,
           ...(data?.results?.length ? data?.results : []),
-        ]; // Append new items
+        ];
         this.entityLoading = false;
       });
 
@@ -134,22 +125,15 @@ export class ReposComponent implements OnInit {
         this.fetchData(GithubDataType?.commits, value || '');
       });
   }
-
   public fetchData(type: GithubDataType, search?: string) {
     this.dataLoading = true;
     this._githubService
-      .getRepos<any[]>(
-        type,
-        this.pagination.page,
-        this.pagination.limit,
-        this.entityId?.value,
-        search
-      )
+      .getRepos<any[]>(type, this.pagination.page, this.pagination.limit, this.entityId?.value, search)
       ?.pipe(
         takeUntilDestroyed(this._destroyRef),
         tap({
           next: (res) => {
-            this._renderCols(type);
+            // this._renderCols(type);
           },
         }),
         map((res: any) => {
@@ -161,37 +145,78 @@ export class ReposComponent implements OnInit {
           }
 
           if (res?.results?.length) {
-            res.results = res?.results?.map((data: any) => {
-              if (type == GithubDataType.commits) {
-                return {
-                  commitId: data?.sha,
-                  author_name: data?.commit?.author?.name,
-                  author_email: data?.commit?.author?.email,
-                  commit_date: data?.commit?.author?.date,
-                  message: data?.commit?.message,
-                  html_url: data?.html_url,
-                };
-              } else if (type == GithubDataType.pullRequests) {
-                return {
-                  id: data?.id,
-                  title: data?.title,
-                  assignee: data?.assignee,
-                  state: data?.state,
-                  closed_at: data?.closed_at,
-                  updated_at: data?.updated_at,
-                };
-              } else if (type == GithubDataType.issues) {
-                return {
-                  id: data?.id,
-                  title: data?.title,
-                  body: data?.body,
-                  closed_by: data?.closed_by,
-                  closed_at: data?.closed_at,
-                  created_at: data?.created_at,
-                };
-              } else {
-                return data;
+            const dynamicColumns = Object.keys(res.results[0]).map((key) => {
+              const value = res.results[0][key];
+              if (typeof value === 'object' || value === null || value === '') {
+                return null;
               }
+              if (key === 'html_url') {
+                return {
+                  headerName: this.formatHeaderName(key),
+                  field: key,
+                  filter: true,
+                  width: 150,
+                  cellRenderer: (params: any) => {
+                    if (params.value) {
+                      return `<a href="${params.value}" target="_blank" rel="noopener noreferrer">${params.value}</a>`;
+                    }
+                    return 'N/A';
+                  },
+                };
+              }
+
+              return {
+                headerName: this.formatHeaderName(key),
+                field: key,
+                filter: true,
+                width: 150,
+              };
+            }).filter(column => column !== null); // Remove null values
+
+            if (res.results[0]?.head) {
+              dynamicColumns.push(
+                {
+                  headerName: 'Base Branch',
+                  field: 'base_label',
+                  filter: true,
+                  width: 150,
+                },
+                {
+                  headerName: 'Head Branch',
+                  field: 'head_label',
+                  filter: true,
+                  width: 150,
+                }
+              );
+            }
+            if (res.results[0]?.commit) {
+              dynamicColumns.push({
+                headerName: 'Commit Author',
+                field: 'name',
+                filter: true,
+                width: 150,
+              });
+              dynamicColumns.push({
+                headerName: 'Commit message',
+                field: 'message',
+                filter: true,
+                width: 150,
+              });
+
+              dynamicColumns.push({
+                headerName: 'Commit Date',
+                field: 'commit_date',
+                filter: true,
+                width: 150,
+              });
+
+
+            }
+
+
+            this.columnDefs = dynamicColumns;
+            res.results = res.results.map((data: any) => {
+              return this.mapDataToTableFormat(data);
             });
           }
 
@@ -214,6 +239,134 @@ export class ReposComponent implements OnInit {
         },
       });
   }
+  private formatHeaderName(key: string): string {
+    return key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+  }
+  private mapDataToTableFormat(data: any): any {
+    const mappedData: any = {};
+    Object.keys(data).forEach((key) => {
+      if (key === 'base') {
+        mappedData['base_label'] = data[key]?.label || 'N/A';
+      } else if (key === 'head') {
+        mappedData['head_label'] = data[key]?.label || 'N/A';
+      } else if (key === 'created_at' || key === 'updated_at' || key === 'closed_at') {
+        mappedData[key] = new Date(data[key]).toLocaleDateString();
+      } else {
+        mappedData[key] = data[key];
+      }
+    });
+    mappedData['commit_date'] = new Date(data.commit?.author?.date).toLocaleDateString() || 'N/A';
+    mappedData['name'] = data.commit?.author?.name || 'N/A';
+    mappedData['message'] = data.commit?.message || 'N/A';
+    mappedData['author_login'] = data.author?.login || 'Unknown';
+    mappedData['author_avatar_url'] = data.author?.avatar_url || 'https://github.com/images/error/octocat_happy.gif';
+
+
+    return mappedData;
+  }
+
+  public detailCellRenderer(params: any) {
+    console.log(params, 'paramsparamsparamsparamsparams')
+    const authorData = params.data;
+    return `
+      <div class="author-details">
+        <h3>Author Details</h3>
+        <div class="author-info">
+          <img src="${authorData?.author_avatar_url || 'https://github.com/images/error/octocat_happy.gif'}" alt="Author Avatar" width="50" height="50">
+          <p><strong>Login:</strong> ${authorData?.author_login || 'Unknown'}</p>
+        </div>
+        <div class="commit-details">
+          <p><strong>Commit Date:</strong> ${authorData?.commit_date || 'Unknown'}</p>
+        </div>
+      </div>
+    `;
+  }
+  onFirstDataRendered(params: any) {
+    params.api.sizeColumnsToFit();
+  }
+
+
+
+  // public fetchData(type: GithubDataType, search?: string) {
+  //   this.dataLoading = true;
+  //   this._githubService
+  //     .getRepos<any[]>(
+  //       type,
+  //       this.pagination.page,
+  //       this.pagination.limit,
+  //       this.entityId?.value,
+  //       search
+  //     )
+  //     ?.pipe(
+  //       takeUntilDestroyed(this._destroyRef),
+  //       tap({
+  //         next: (res) => {
+  //           this._renderCols(type);
+  //         },
+  //       }),
+  //       map((res: any) => {
+  //         if (search) {
+  //           res = {
+  //             results: res?.[type]?.results,
+  //             pagination: res?.[type]?.pagination,
+  //           };
+  //         }
+
+  //         if (res?.results?.length) {
+  //           res.results = res?.results?.map((data: any) => {
+  //             if (type == GithubDataType.commits) {
+  //               return {
+  //                 commitId: data?.sha,
+  //                 author_name: data?.commit?.author?.name,
+  //                 author_email: data?.commit?.author?.email,
+  //                 commit_date: data?.commit?.author?.date,
+  //                 message: data?.commit?.message,
+  //                 html_url: data?.html_url,
+  //               };
+  //             } else if (type == GithubDataType.pullRequests) {
+  //               return {
+  //                 id: data?.id,
+  //                 title: data?.title,
+  //                 assignee: data?.assignee,
+  //                 state: data?.state,
+  //                 closed_at: data?.closed_at,
+  //                 updated_at: data?.updated_at,
+  //                 repoName:data?.repoName
+  //               };
+  //             } else if (type == GithubDataType.issues) {
+  //               return {
+  //                 id: data?.id,
+  //                 title: data?.title,
+  //                 body: data?.body,
+  //                 closed_by: data?.closed_by,
+  //                 closed_at: data?.closed_at,
+  //                 created_at: data?.created_at,
+  //               };
+  //             } else {
+  //               return data;
+  //             }
+  //           });
+  //         }
+
+  //         return res;
+  //       })
+  //     )
+  //     .subscribe({
+  //       next: (res) => {
+  //         this.pagination.page = res?.pagination?.page;
+  //         this.pagination.limit = res?.pagination?.limit;
+  //         this.pagination.total = res?.pagination?.total;
+  //         this.pagination.totalPages = res?.pagination?.totalPages;
+
+  //         this.rowData = res?.results?.length ? res?.results : [];
+  //         this.dataLoading = false;
+  //       },
+  //       error: (err) => {
+  //         this.dataLoading = false;
+  //         alert(err?.error?.message);
+  //       },
+  //     });
+  // }
 
   // Handle entity search
   private _handleEntitySearch() {
@@ -250,9 +403,6 @@ export class ReposComponent implements OnInit {
     );
   }
 
-  // Entity Autocomplete events
-
-  // On scroll event to fetch more entity data
   public onAutocompleteOpened(): void {
     const autocomplete = document.querySelector('.cdk-overlay-pane');
     if (autocomplete) {
@@ -260,7 +410,6 @@ export class ReposComponent implements OnInit {
     }
   }
 
-  // Entity autocomplete on scroll
   public onScroll(event: any): void {
     const { scrollTop, scrollHeight, clientHeight } = event.target;
     if (
@@ -280,148 +429,15 @@ export class ReposComponent implements OnInit {
         });
     }
   }
+  public openAuthorModal(event: any): void {
 
-  private _renderCols(type: GithubDataType) {
-    if (type == GithubDataType.commits) {
-      this.columnDefs = [
-        {
-          headerName: 'Commit ID',
-          field: 'commitId',
-          width: 120,
-          filter: true,
-          cellRenderer: (params: any) => {
-            // Create a link element with the URL in the 'website' field
-            return `<a href="${params.data.html_url}" target="_blank">${params.value}</a>`;
-          },
-        },
-        {
-          field: 'author_name',
-          width: 250,
-          minWidth: 250,
-          flex: 1,
-          filter: true,
-        },
-        {
-          field: 'author_email',
-          width: 250,
-          minWidth: 250,
-          flex: 1,
-          filter: true,
-        },
-        {
-          field: 'commit_date',
-          width: 180,
-          minWidth: 180,
-          flex: 1,
-          filter: true,
-          valueFormatter: this.dateFormatter,
-        },
-        {
-          field: 'message',
-          width: 200,
-          minWidth: 200,
-          flex: 1,
-          filter: true,
-        },
-      ];
-    }
-
-    if (type == GithubDataType.pullRequests) {
-      this.columnDefs = [
-        {
-          headerName: 'Pull Request ID',
-          field: 'id',
-          width: 120,
-          filter: true,
-        },
-        {
-          field: 'title',
-          width: 200,
-          minWidth: 200,
-          flex: 1,
-          filter: true,
-        },
-        {
-          field: 'assignee',
-          width: 250,
-          minWidth: 250,
-          flex: 1,
-          filter: true,
-        },
-        {
-          field: 'state',
-          width: 250,
-          minWidth: 250,
-          flex: 1,
-          filter: true,
-          valueFormatter: (params: any) => params?.value?.toUpperCase() || '-',
-        },
-        {
-          field: 'closed_at',
-          width: 180,
-          minWidth: 180,
-          flex: 1,
-          filter: true,
-          valueFormatter: this.dateFormatter,
-        },
-        {
-          field: 'updated_at',
-          width: 180,
-          minWidth: 180,
-          flex: 1,
-          filter: true,
-          valueFormatter: this.dateFormatter,
-        },
-      ];
-    }
-
-    if (type == GithubDataType.issues) {
-      this.columnDefs = [
-        {
-          headerName: 'Issue ID',
-          field: 'id',
-          width: 120,
-          filter: true,
-        },
-        {
-          field: 'title',
-          width: 200,
-          minWidth: 200,
-          flex: 1,
-          filter: true,
-        },
-        {
-          field: 'body',
-          width: 250,
-          minWidth: 250,
-          flex: 1,
-          filter: true,
-        },
-        {
-          field: 'closed_by',
-          width: 250,
-          minWidth: 250,
-          flex: 1,
-          filter: true,
-          valueFormatter: (params: any) => params?.value?.toUpperCase() || '-',
-        },
-        {
-          field: 'closed_at',
-          width: 180,
-          minWidth: 180,
-          flex: 1,
-          filter: true,
-          valueFormatter: this.dateFormatter,
-        },
-        {
-          field: 'created_at',
-          width: 180,
-          minWidth: 180,
-          flex: 1,
-          filter: true,
-          valueFormatter: this.dateFormatter,
-        },
-      ];
+    if (event.colDef.field === 'html_url') {
+      return;
+    } else {
+      const clickedData = event.data
+      this.dialog.open(AuthorModalComponent, {
+        data: clickedData,
+      });
     }
   }
 
@@ -432,6 +448,7 @@ export class ReposComponent implements OnInit {
 
   public dateFormatter(params: any): string {
     const date = params.value; // The cell value
-    return date ? dayjs(date).format('MM-DD-YYYY hh:mm a') : '-'; // Format or return an empty string
+    return date ? dayjs(date).format('MM-DD-YYYY hh:mm a') : '-';
   }
+
 }

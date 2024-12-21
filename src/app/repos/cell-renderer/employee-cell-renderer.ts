@@ -68,10 +68,16 @@ export class EmployeeCellRenderer implements ICellRendererAngularComp {
   public image?: string;
   public jobTitle?: string;
 
+  // agInit(params: ICellRendererParams): void {
+  //   this.value = params.value;
+  //   this.image = params.data.image;
+  //   this.jobTitle = params.data.jobTitle;
+  // }
   agInit(params: ICellRendererParams): void {
-    this.value = params.value;
-    this.image = params.data.image;
-    this.jobTitle = params.data.jobTitle;
+    const typedParams = params as ICellRendererParams;  // Explicitly cast the params type
+    this.value = typedParams.value;
+    this.image = typedParams.data.image;
+    this.jobTitle = typedParams.data.jobTitle;
   }
 
   refresh(params: ICellRendererParams): boolean {

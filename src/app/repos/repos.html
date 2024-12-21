@@ -1,9 +1,7 @@
 <form [formGroup]="filterForm">
   <div class="row">
     <div class="col-12 col-md-4 form-field-container">
-      <label for="activeIntegration" class="field-label"
-        >Active Integration:</label
-      >
+      <label for="activeIntegration" class="field-label">Active Integration:</label>
       <mat-form-field [appearance]="'outline'">
         <mat-select formControlName="activeIntegration">
           <mat-option value="github">Github</mat-option>
@@ -42,12 +40,7 @@
     <div class="col-12 col-md-4 form-field-container">
       <label for="search" class="field-label">Search:</label>
       <mat-form-field [appearance]="'outline'">
-        <input
-          matInput
-          type="text"
-          placeholder="Search"
-          formControlName="search"
-        />
+        <input matInput type="text" placeholder="Search" formControlName="search" />
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
     </div>
@@ -57,28 +50,27 @@
 @if(filterForm.controls.entity?.value) {
 <div class="wrapper">
   <div [class]="themeClass" class="grid m-0">
-    <ag-grid-angular
-      style="height: 100%"
-      [rowData]="rowData"
-      [columnDefs]="columnDefs"
-      [autoGroupColumnDef]="autoGroupColumnDef"
-      [loading]="dataLoading"
-    ></ag-grid-angular>
+    <ag-grid-angular style="height: 100%" [rowData]="rowData" [columnDefs]="columnDefs"
+      [autoGroupColumnDef]="autoGroupColumnDef" [loading]="dataLoading"
+      (cellClicked)="openAuthorModal($event)"></ag-grid-angular>
+    <!-- <ag-grid-angular
+    style="height: 100%"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    [autoGroupColumnDef]="autoGroupColumnDef"
+    [loading]="dataLoading"
+    [detailCellRenderer]="detailCellRenderer"
+    [detailCellRendererParams]="detailCellRendererParams"
+    (firstDataRendered)="onFirstDataRendered($event)"
+  ></ag-grid-angular> -->
+
+
+
   </div>
 </div>
 
-<mat-paginator
-  #paginator
-  class="ag-grid-paginator"
-  (page)="handlePageEvent($event)"
-  [length]="pagination.total"
-  [pageSize]="pagination.limit"
-  [disabled]="false"
-  [showFirstLastButtons]="true"
-  [pageSizeOptions]="[10, 20, 25, 50]"
-  [hidePageSize]="false"
-  [pageIndex]="pagination.page == 1 ? 0 : pagination.page - 1"
-  aria-label="Select page"
->
+<mat-paginator #paginator class="ag-grid-paginator" (page)="handlePageEvent($event)" [length]="pagination.total"
+  [pageSize]="pagination.limit" [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[10, 20, 25, 50]"
+  [hidePageSize]="false" [pageIndex]="pagination.page == 1 ? 0 : pagination.page - 1" aria-label="Select page">
 </mat-paginator>
 }
