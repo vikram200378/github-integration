@@ -9,7 +9,7 @@ import { ICellRendererAngularComp } from 'ag-grid-angular';
     <div class="employeeCell">
       <div class="employeeData">
         <span>{{ value }}</span>
-        <span class="description">{{ jobTitle }}</span>
+        <!-- <span class="description">{{ jobTitle }}</span> -->
       </div>
       <img
         class="image"
@@ -66,7 +66,6 @@ import { ICellRendererAngularComp } from 'ag-grid-angular';
 export class EmployeeCellRenderer implements ICellRendererAngularComp {
   public value?: string;
   public image?: string;
-  public jobTitle?: string;
 
   // agInit(params: ICellRendererParams): void {
   //   this.value = params.value;
@@ -77,13 +76,11 @@ export class EmployeeCellRenderer implements ICellRendererAngularComp {
     const typedParams = params as ICellRendererParams;  // Explicitly cast the params type
     this.value = typedParams.value;
     this.image = typedParams.data.image;
-    this.jobTitle = typedParams.data.jobTitle;
   }
 
   refresh(params: ICellRendererParams): boolean {
     this.value = params.value;
     this.image = params.data.image;
-    this.jobTitle = params.data.jobTitle;
     return true;
   }
 }

@@ -125,145 +125,231 @@ export class ReposComponent implements OnInit {
         this.fetchData(GithubDataType?.commits, value || '');
       });
   }
-  public fetchData(type: GithubDataType, search?: string) {
+  // public fetchData(type: GithubDataType, search?: string) {
+  //   this.dataLoading = true;
+  //   this._githubService
+  //     .getRepos<any[]>(type, this.pagination.page, this.pagination.limit, this.entityId?.value, search)
+  //     ?.pipe(
+  //       takeUntilDestroyed(this._destroyRef),
+  //       tap({
+  //         next: (res) => {
+  //           // this._renderCols(type);
+  //         },
+  //       }),
+  //       map((res: any) => {
+  //         if (search) {
+  //           res = {
+  //             results: res?.[type]?.results,
+  //             pagination: res?.[type]?.pagination,
+  //           };
+  //         }
+
+  //         if (res?.results?.length) {
+  //           const dynamicColumns = Object.keys(res.results[0]).map((key) => {
+  //             const value = res.results[0][key];
+  //             if (typeof value === 'object' || value === null || value === '') {
+  //               return null;
+  //             }
+  //             if (key === 'html_url') {
+  //               return {
+  //                 headerName: this.formatHeaderName(key),
+  //                 field: key,
+  //                 filter: true,
+  //                 width: 150,
+  //                 cellRenderer: (params: any) => {
+  //                   if (params.value) {
+  //                     return `<a href="${params.value}" target="_blank" rel="noopener noreferrer">${params.value}</a>`;
+  //                   }
+  //                   return 'N/A';
+  //                 },
+  //               };
+  //             }
+
+  //             return {
+  //               headerName: this.formatHeaderName(key),
+  //               field: key,
+  //               filter: true,
+  //               width: 150,
+  //             };
+  //           }).filter(column => column !== null); // Remove null values
+
+  //           if (res.results[0]?.head) {
+  //             dynamicColumns.push(
+  //               {
+  //                 headerName: 'Base Branch',
+  //                 field: 'base_label',
+  //                 filter: true,
+  //                 width: 150,
+  //               },
+  //               {
+  //                 headerName: 'Head Branch',
+  //                 field: 'head_label',
+  //                 filter: true,
+  //                 width: 150,
+  //               }
+  //             );
+  //           }
+  //           if (res.results[0]?.commit) {
+  //             dynamicColumns.push({
+  //               headerName: 'Commit Author',
+  //               field: 'name',
+  //               filter: true,
+  //               width: 150,
+  //             });
+  //             dynamicColumns.push({
+  //               headerName: 'Commit message',
+  //               field: 'message',
+  //               filter: true,
+  //               width: 150,
+  //             });
+
+  //             dynamicColumns.push({
+  //               headerName: 'Commit Date',
+  //               field: 'commit_date',
+  //               filter: true,
+  //               width: 150,
+  //             });
+
+
+  //           }
+
+
+  //           this.columnDefs = dynamicColumns;
+  //           res.results = res.results.map((data: any) => {
+  //             return this.mapDataToTableFormat(data);
+  //           });
+  //         }
+
+  //         return res;
+  //       })
+  //     )
+  //     .subscribe({
+  //       next: (res) => {
+  //         this.pagination.page = res?.pagination?.page;
+  //         this.pagination.limit = res?.pagination?.limit;
+  //         this.pagination.total = res?.pagination?.total;
+  //         this.pagination.totalPages = res?.pagination?.totalPages;
+
+  //         this.rowData = res?.results?.length ? res?.results : [];
+  //         this.dataLoading = false;
+  //       },
+  //       error: (err) => {
+  //         this.dataLoading = false;
+  //         alert(err?.error?.message);
+  //       },
+  //     });
+  // }
+  // private formatHeaderName(key: string): string {
+  //   return key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+  // }
+  // private mapDataToTableFormat(data: any): any {
+  //   const mappedData: any = {};
+  //   Object.keys(data).forEach((key) => {
+  //     if (key === 'base') {
+  //       mappedData['base_label'] = data[key]?.label || 'N/A';
+  //     } else if (key === 'head') {
+  //       mappedData['head_label'] = data[key]?.label || 'N/A';
+  //     } else if (key === 'created_at' || key === 'updated_at' || key === 'closed_at') {
+  //       mappedData[key] = new Date(data[key]).toLocaleDateString();
+  //     } else {
+  //       mappedData[key] = data[key];
+  //     }
+  //   });
+  //   mappedData['commit_date'] = new Date(data.commit?.author?.date).toLocaleDateString() || 'N/A';
+  //   mappedData['name'] = data.commit?.author?.name || 'N/A';
+  //   mappedData['message'] = data.commit?.message || 'N/A';
+  //   mappedData['author_login'] = data.author?.login || 'Unknown';
+  //   mappedData['author_avatar_url'] = data.author?.avatar_url || 'https://github.com/images/error/octocat_happy.gif';
+
+
+  //   return mappedData;
+  // }
+  public fetchData(type: any, search?: string): void {
     this.dataLoading = true;
+
     this._githubService
       .getRepos<any[]>(type, this.pagination.page, this.pagination.limit, this.entityId?.value, search)
       ?.pipe(
         takeUntilDestroyed(this._destroyRef),
-        tap({
-          next: (res) => {
-            // this._renderCols(type);
-          },
-        }),
         map((res: any) => {
-          if (search) {
-            res = {
-              results: res?.[type]?.results,
-              pagination: res?.[type]?.pagination,
-            };
-          }
-
           if (res?.results?.length) {
-            const dynamicColumns = Object.keys(res.results[0]).map((key) => {
-              const value = res.results[0][key];
-              if (typeof value === 'object' || value === null || value === '') {
-                return null;
-              }
-              if (key === 'html_url') {
-                return {
-                  headerName: this.formatHeaderName(key),
-                  field: key,
-                  filter: true,
-                  width: 150,
-                  cellRenderer: (params: any) => {
-                    if (params.value) {
-                      return `<a href="${params.value}" target="_blank" rel="noopener noreferrer">${params.value}</a>`;
-                    }
-                    return 'N/A';
-                  },
-                };
-              }
-
-              return {
-                headerName: this.formatHeaderName(key),
-                field: key,
-                filter: true,
-                width: 150,
-              };
-            }).filter(column => column !== null); // Remove null values
-
-            if (res.results[0]?.head) {
-              dynamicColumns.push(
-                {
-                  headerName: 'Base Branch',
-                  field: 'base_label',
-                  filter: true,
-                  width: 150,
-                },
-                {
-                  headerName: 'Head Branch',
-                  field: 'head_label',
-                  filter: true,
-                  width: 150,
-                }
-              );
-            }
-            if (res.results[0]?.commit) {
-              dynamicColumns.push({
-                headerName: 'Commit Author',
-                field: 'name',
-                filter: true,
-                width: 150,
-              });
-              dynamicColumns.push({
-                headerName: 'Commit message',
-                field: 'message',
-                filter: true,
-                width: 150,
-              });
-
-              dynamicColumns.push({
-                headerName: 'Commit Date',
-                field: 'commit_date',
-                filter: true,
-                width: 150,
-              });
-
-
-            }
-
-
-            this.columnDefs = dynamicColumns;
-            res.results = res.results.map((data: any) => {
-              return this.mapDataToTableFormat(data);
-            });
+            // Flatten the data for each row in the results
+            
+            this.columnDefs = this.generateDynamicColumns(res?.results[0]);
+            res.results = res.results.map((data: any) => this.flattenData(data));
           }
-
           return res;
         })
       )
       .subscribe({
         next: (res) => {
-          this.pagination.page = res?.pagination?.page;
-          this.pagination.limit = res?.pagination?.limit;
-          this.pagination.total = res?.pagination?.total;
-          this.pagination.totalPages = res?.pagination?.totalPages;
+          this.pagination = { ...this.pagination, ...res?.pagination };
+          this.rowData = res?.results ?? []; // Bind the flattened data to ag-Grid
 
-          this.rowData = res?.results?.length ? res?.results : [];
+
           this.dataLoading = false;
         },
         error: (err) => {
           this.dataLoading = false;
           alert(err?.error?.message);
-        },
+        }
       });
   }
-  private formatHeaderName(key: string): string {
-    return key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+  private flattenData(data: any): any {
+    const flatten = (obj: any, prefix: string = ''): any =>
+      Object.keys(obj).reduce((acc, key) => {
+        const prop = obj[key];
+        const newKey = prefix
+          ? `${prefix}_${key}`
+          : key;
+        if (typeof prop === 'object' && prop !== null) {
+          return { ...acc, ...flatten(prop, newKey) };
+        } else {
+          return { ...acc, [newKey]: prop ?? 'NA' };
+        }
+      }, {});
+  
+    return flatten(data);
   }
-  private mapDataToTableFormat(data: any): any {
-    const mappedData: any = {};
-    Object.keys(data).forEach((key) => {
-      if (key === 'base') {
-        mappedData['base_label'] = data[key]?.label || 'N/A';
-      } else if (key === 'head') {
-        mappedData['head_label'] = data[key]?.label || 'N/A';
-      } else if (key === 'created_at' || key === 'updated_at' || key === 'closed_at') {
-        mappedData[key] = new Date(data[key]).toLocaleDateString();
-      } else {
-        mappedData[key] = data[key];
+  
+  private generateDynamicColumns(firstRow: any): any[] {
+    const flattenItem = this.flattenData(firstRow);
+    console.log(flattenItem, 'Flattened Item');
+  
+    const columns = Object.keys(flattenItem).map((key: string) => {
+      if (key === 'html_url') {
+        return {
+          headerName: this.formatHeaderName(key),
+          field: key,
+          cellRenderer: (params: any) => {
+            return `<a href="${params.value}" target="_blank" rel="noopener noreferrer">${params.value}</a>`;
+          },
+          filter: true,
+          width: 200,
+        };
       }
+  
+      return {
+        headerName: this.formatHeaderName(key),
+        field: key,
+        filter: true,
+        width: 150,
+      };
     });
-    mappedData['commit_date'] = new Date(data.commit?.author?.date).toLocaleDateString() || 'N/A';
-    mappedData['name'] = data.commit?.author?.name || 'N/A';
-    mappedData['message'] = data.commit?.message || 'N/A';
-    mappedData['author_login'] = data.author?.login || 'Unknown';
-    mappedData['author_avatar_url'] = data.author?.avatar_url || 'https://github.com/images/error/octocat_happy.gif';
-
-
-    return mappedData;
+  
+    console.log('Generated Columns:', columns);
+    return columns;
   }
+  
+  
+  // Format header names into human-readable format
+  private formatHeaderName(key: string): string {
+    return key
+      .split('.')
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+  }
+
 
   public detailCellRenderer(params: any) {
     console.log(params, 'paramsparamsparamsparamsparams')
@@ -435,6 +521,7 @@ export class ReposComponent implements OnInit {
       return;
     } else {
       const clickedData = event.data
+      console.log(clickedData,'clickedDataclickedDataclickedData')
       this.dialog.open(AuthorModalComponent, {
         data: clickedData,
       });
