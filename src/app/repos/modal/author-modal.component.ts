@@ -17,68 +17,59 @@ import { MatButtonModule } from '@angular/material/button';
     TitleCasePipe,
     DatePipe
   ],
-  template: `
-    <h2 mat-dialog-title class="modal-title">Author Details</h2>
-    <mat-dialog-content>
-      <mat-card class="modal-card">
-        <mat-card-content class="author-content">
-          <!-- Check if data is an array (for multiple users) -->
-          <div *ngIf="Array?.isArray(data); else singleUser">
-            <div *ngFor="let author of data">
-              <!-- Author Avatar -->
-              <div class="author-avatar">
-                <img [src]="author.author_avatar_url" alt="Author Avatar" class="avatar-img" />
-              </div>
+  template: `<h2 mat-dialog-title class="modal-title">Details</h2>
+  <mat-dialog-content>
+    <mat-card class="modal-card">
+      <mat-card-content>
+        <!-- User Details -->
+        <div *ngIf="isUserDetails(); else commitDetails">
+          <div class="author-avatar">
+            <!-- <img [src]="data.user_avatar_url" alt="User Avatar" class="avatar-img" /> -->
+            <img 
+  [src]="data.user_avatar_url || 'https://via.placeholder.com/100'" 
+  alt="Author Avatar" 
+  class="avatar-img" 
+/>
 
-              <!-- Author Info -->
-              <div class="author-info">
-                <h3>{{ author.author_login | titlecase }}</h3>
-                <p><strong>Email:</strong> {{ author.commit_author_email }}</p>
-                <p *ngIf="author.authorBio"><strong>Bio:</strong> {{ author.authorBio || 'NA' }}</p>
-                <p *ngIf="author.authorJoinedDate">
-                  <strong>Joined:</strong> {{ author.commit_author_date | date: 'medium' }}
-                </p>
-                <p *ngIf="!author.authorJoinedDate"><strong>Joined:</strong> N/A</p>
-                <p><strong>Type:</strong> {{ author.author_type }}</p>
-                <p *ngIf="author.author_organizations_url">
-                  <strong>Organizations URL:</strong>
-                  <a [href]="author.author_organizations_url" target="_blank">{{ author.author_organizations_url }}</a>
-                </p>
-              </div>
-            </div>
           </div>
-          <!-- Single user case (fallback when not an array) -->
-          <ng-template #singleUser>
-            <div *ngIf="data">
-              <!-- Author Avatar -->
-              <div class="author-avatar">
-                <img [src]="data.user_avatar_url" alt="Author Avatar" class="avatar-img" />
-              </div>
+          <div class="author-info">
+            <h3>{{ data.user_login | titlecase }}</h3>
+            <p><strong>Email:</strong> {{ data.commit_author_email || 'NA' }}</p>
+            <p *ngIf="data.authorBio"><strong>Bio:</strong> {{ data.authorBio || 'NA' }}</p>
+            <p><strong>Joined:</strong> {{ data.authorJoinedDate ? (data.authorJoinedDate | date: 'medium') : 'N/A' }}</p>
+            <p><strong>Type:</strong> {{ data.user_type }}</p>
+            <p *ngIf="data.user_organizations_url">
+              <strong>Organizations URL:</strong>
+              <a [href]="data.user_organizations_url" target="_blank">{{ data.user_organizations_url }}</a>
+            </p>
+          </div>
+        </div>
 
-              <!-- Author Info -->
-              <div class="author-info">
-                <h3>{{ data.user_login | titlecase }}</h3>
-                <p><strong>Email:</strong> {{ data.commit_author_email }}</p>
-                <p *ngIf="data.authorBio"><strong>Bio:</strong> {{ data.authorBio || 'NA' }}</p>
-                <p *ngIf="data.authorJoinedDate">
-                  <strong>Joined:</strong> {{ data.commit_author_date | date: 'medium' }}
-                </p>
-                <p *ngIf="!data.authorJoinedDate"><strong>Joined:</strong> N/A</p>
-                <p><strong>Type:</strong> {{ data.user_type }}</p>
-                <p *ngIf="data.author_organizations_url">
-                  <strong>Organizations URL:</strong>
-                  <a [href]="data.user_organizations_url" target="_blank">{{ data.user_organizations_url }}</a>
-                </p>
-              </div>
-            </div>
-          </ng-template>
-        </mat-card-content>
-      </mat-card>
-    </mat-dialog-content>
+        <!-- Commit Details -->
+        <ng-template #commitDetails>
 
-    <mat-dialog-actions>
-      <button mat-button (click)="closeDialog()">Close</button>
-    </mat-dialog-actions>
+          <div class="author-info">
+          <div class="author-avatar">
+            <!-- <img [src]="data.user_avatar_url" alt="User Avatar" class="avatar-img" /> -->
+            <img 
+  [src]="data.author_avatar_url || 'https://via.placeholder.com/100'" 
+  alt="Author Avatar" 
+  class="avatar-img" 
+/>
+
+          </div>
+            <p><strong>Commit Author:</strong> {{ data.commit_author_name }}</p>
+            <p><strong>Commit Date:</strong> {{ data.commit_author_date | date: 'medium' }}</p>
+            <p><strong>Commit Message:</strong> {{ data.commit_message }}</p>
+            <p><strong>Commit Email:</strong> {{ data.commit_author_email }}</p>
+          </div>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button (click)="closeDialog()">Close</button>
+  </mat-dialog-actions>
   `,
   styles: [`
     /* Modal Title */
@@ -169,11 +160,14 @@ import { MatButtonModule } from '@angular/material/button';
   `]
 })
 export class AuthorModalComponent {
-Array: any;
+  Array: any;
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private dialogRef: MatDialogRef<AuthorModalComponent>
-  ) {}
+  ) { }
+  isUserDetails(): boolean {
+    return !!this.data.user_avatar_url; // Check for a property unique to user details
+  }
 
   closeDialog(): void {
     this.dialogRef.close();
