@@ -17,7 +17,6 @@ import { AgGridAngular } from 'ag-grid-angular';
 import { EmployeeCellRenderer } from './cell-renderer/employee-cell-renderer';
 import type { ColDef } from 'ag-grid-community';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
-import { GithubDataType, GithubService } from './services/github.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Pagination } from 'src/shared/interfaces';
 import { debounceTime, finalize, map, of, switchMap, tap } from 'rxjs';
@@ -210,9 +209,7 @@ export class ReposComponent implements OnInit {
   //               width: 150,
   //             });
 
-
   //           }
-
 
   //           this.columnDefs = dynamicColumns;
   //           res.results = res.results.map((data: any) => {
@@ -261,22 +258,29 @@ export class ReposComponent implements OnInit {
   //   mappedData['author_login'] = data.author?.login || 'Unknown';
   //   mappedData['author_avatar_url'] = data.author?.avatar_url || 'https://github.com/images/error/octocat_happy.gif';
 
-
   //   return mappedData;
   // }
   public fetchData(type: any, search?: string): void {
     this.dataLoading = true;
 
     this._githubService
-      .getRepos<any[]>(type, this.pagination.page, this.pagination.limit, this.entityId?.value, search)
+      .getRepos<any[]>(
+        type,
+        this.pagination.page,
+        this.pagination.limit,
+        this.entityId?.value,
+        search
+      )
       ?.pipe(
         takeUntilDestroyed(this._destroyRef),
         map((res: any) => {
           if (res?.results?.length) {
             // Flatten the data for each row in the results
-            
+
             this.columnDefs = this.generateDynamicColumns(res?.results[0]);
-            res.results = res.results.map((data: any) => this.flattenData(data));
+            res.results = res.results.map((data: any) =>
+              this.flattenData(data)
+            );
           }
           return res;
         })
@@ -286,36 +290,33 @@ export class ReposComponent implements OnInit {
           this.pagination = { ...this.pagination, ...res?.pagination };
           this.rowData = res?.results ?? []; // Bind the flattened data to ag-Grid
 
-
           this.dataLoading = false;
         },
         error: (err) => {
           this.dataLoading = false;
           alert(err?.error?.message);
-        }
+        },
       });
   }
   private flattenData(data: any): any {
     const flatten = (obj: any, prefix: string = ''): any =>
       Object.keys(obj).reduce((acc, key) => {
         const prop = obj[key];
-        const newKey = prefix
-          ? `${prefix}_${key}`
-          : key;
+        const newKey = prefix ? `${prefix}_${key}` : key;
         if (typeof prop === 'object' && prop !== null) {
           return { ...acc, ...flatten(prop, newKey) };
         } else {
           return { ...acc, [newKey]: prop ?? 'NA' };
         }
       }, {});
-  
+
     return flatten(data);
   }
-  
+
   private generateDynamicColumns(firstRow: any): any[] {
     const flattenItem = this.flattenData(firstRow);
     console.log(flattenItem, 'Flattened Item');
-  
+
     const columns = Object.keys(flattenItem).map((key: string) => {
       if (key === 'html_url') {
         return {
@@ -328,7 +329,7 @@ export class ReposComponent implements OnInit {
           width: 200,
         };
       }
-  
+
       return {
         headerName: this.formatHeaderName(key),
         field: key,
@@ -336,12 +337,11 @@ export class ReposComponent implements OnInit {
         width: 150,
       };
     });
-  
+
     console.log('Generated Columns:', columns);
     return columns;
   }
-  
-  
+
   // Format header names into human-readable format
   private formatHeaderName(key: string): string {
     return key
@@ -350,19 +350,25 @@ export class ReposComponent implements OnInit {
       .join(' ');
   }
 
-
   public detailCellRenderer(params: any) {
-    console.log(params, 'paramsparamsparamsparamsparams')
+    console.log(params, 'paramsparamsparamsparamsparams');
     const authorData = params.data;
     return `
       <div class="author-details">
         <h3>Author Details</h3>
         <div class="author-info">
-          <img src="${authorData?.author_avatar_url || 'https://github.com/images/error/octocat_happy.gif'}" alt="Author Avatar" width="50" height="50">
-          <p><strong>Login:</strong> ${authorData?.author_login || 'Unknown'}</p>
+          <img src="${
+            authorData?.author_avatar_url ||
+            'https://github.com/images/error/octocat_happy.gif'
+          }" alt="Author Avatar" width="50" height="50">
+          <p><strong>Login:</strong> ${
+            authorData?.author_login || 'Unknown'
+          }</p>
         </div>
         <div class="commit-details">
-          <p><strong>Commit Date:</strong> ${authorData?.commit_date || 'Unknown'}</p>
+          <p><strong>Commit Date:</strong> ${
+            authorData?.commit_date || 'Unknown'
+          }</p>
         </div>
       </div>
     `;
@@ -370,8 +376,6 @@ export class ReposComponent implements OnInit {
   onFirstDataRendered(params: any) {
     params.api.sizeColumnsToFit();
   }
-
-
 
   // public fetchData(type: GithubDataType, search?: string) {
   //   this.dataLoading = true;
@@ -516,12 +520,11 @@ export class ReposComponent implements OnInit {
     }
   }
   public openAuthorModal(event: any): void {
-
     if (event.colDef.field === 'html_url') {
       return;
     } else {
-      const clickedData = event.data
-      console.log(clickedData,'clickedDataclickedDataclickedData')
+      const clickedData = event.data;
+      console.log(clickedData, 'clickedDataclickedDataclickedData');
       this.dialog.open(AuthorModalComponent, {
         data: clickedData,
       });
@@ -538,4 +541,8 @@ export class ReposComponent implements OnInit {
     return date ? dayjs(date).format('MM-DD-YYYY hh:mm a') : '-';
   }
 
+  // Handle Entity Change
+  public handleEntityChange(value: string) {
+    console.log(value);
+  }
 }

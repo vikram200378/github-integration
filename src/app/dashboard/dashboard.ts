@@ -12,16 +12,15 @@ import {
 } from 'src/shared/interfaces/github';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
-import { ReposComponent } from '../repos/repos';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   catchError,
   interval,
   switchMap,
-  takeUntil,
   takeWhile,
   throwError,
 } from 'rxjs';
+import { CollectionsComponent } from '../collections/collections';
 @Component({
   selector: 'git-dashboard',
   templateUrl: './dashboard.html',
@@ -33,7 +32,7 @@ import {
     MatButtonModule,
     NgIf,
     MatSnackBarModule,
-    ReposComponent,
+    CollectionsComponent,
     MatCardModule,
     MatProgressSpinnerModule,
   ],

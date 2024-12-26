@@ -1,0 +1,91 @@
+<github-collections-filter />
+
+<hr />
+<br />
+
+<!-- Organisation -->
+@if(organisationCols && organisationCols.length) {
+<github-collection-table
+  [label]="'Organisation'"
+  [columnDefs]="organisationCols"
+  [rowData]="organisationRows"
+  [pagination]="organisationPagination"
+  [dataLoading]="organisationLoading"
+/>
+
+<hr />
+<br />
+}
+
+<!-- Authors -->
+@if(authorsCols && authorsCols.length) {
+<github-collection-table
+  [label]="'Authors'"
+  [columnDefs]="authorsCols"
+  [rowData]="authorsRows"
+  [pagination]="authorsPagination"
+  [dataLoading]="authorsLoading"
+/>
+
+<hr />
+<br />
+}
+
+<!-- Commits -->
+@if (commitsCols && commitsCols.length) {
+<github-collection-table
+  [label]="'Commits'"
+  [columnDefs]="commitsCols"
+  [rowData]="commitsRows"
+  [pagination]="commitsPagination"
+  [dataLoading]="commitsLoading"
+/>
+
+<hr />
+<br />
+}
+
+<!-- Issues -->
+@if (issuesCols && issuesCols.length) {
+
+<github-collection-table
+  [label]="'Issues'"
+  [columnDefs]="issuesCols"
+  [rowData]="issuesRows"
+  [pagination]="issuesPagination"
+  [dataLoading]="issuesLoading"
+/>
+
+<hr />
+<br />
+}
+
+<!-- Pull Requests -->
+@if(pullRequestsCols && pullRequestsCols.length) {
+
+<github-collection-table
+  [label]="'Pull Requests'"
+  [columnDefs]="pullRequestsCols"
+  [rowData]="pullRequestsRows"
+  [pagination]="pullRequestsPagination"
+  [dataLoading]="pullRequestsLoading"
+/>
+
+<hr />
+<br />
+}
+
+<!-- Repositories -->
+@if(repositoriesCols && repositoriesCols.length) {
+
+<github-collection-table
+  [label]="'Repositories'"
+  [columnDefs]="repositoriesCols"
+  [rowData]="repositoriesRows"
+  [pagination]="repositoriesPagination"
+  [dataLoading]="repositoriesLoading"
+/>
+
+<hr />
+<br />
+}

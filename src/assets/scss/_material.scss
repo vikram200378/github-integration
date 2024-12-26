@@ -2,3 +2,8 @@
 .mat-mdc-card {
   border-radius: 4px !important;
 }
+
+.mat-mdc-card-content,
+.mat-mdc-paginator-container {
+  background-color: #fff !important;
+}

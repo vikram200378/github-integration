@@ -1,0 +1,29 @@
+@if(columnDefs) {
+  <h5><b>{{label}}</b></h5>
+  <div class="wrapper">
+    <div [class]="statics.themeClass" class="grid m-0">
+      <ag-grid-angular
+        style="height: 100%"
+        [rowData]="rowData"
+        [columnDefs]="columnDefs"
+        [loading]="dataLoading"
+        (cellClicked)="handleCellClicked($event)"
+      ></ag-grid-angular>
+    </div>
+  </div>
+  
+  @if(pagination) {
+  <mat-paginator
+    class="ag-grid-paginator"
+    aria-label="Select page"
+    [length]="pagination.total"
+    [pageSize]="pagination.limit"
+    [disabled]="statics.disabled"
+    [showFirstLastButtons]="statics.showFirstLastButtons"
+    [pageSizeOptions]="statics.pageSizeOptions"
+    [hidePageSize]="statics.hidePageSize"
+    [pageIndex]="pagination.page == 1 ? 0 : pagination.page - 1"
+    (page)="handlePageEvent($event)"
+  />
+  }
+}

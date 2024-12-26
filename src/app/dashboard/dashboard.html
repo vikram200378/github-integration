@@ -25,7 +25,9 @@
                   @if(syncLoader) {
                   <div class="d-flex flex-row align-items-center gap-2">
                     <mat-spinner class="loader"></mat-spinner>
-                    <span style="font-size: 13px; font-weight: 400;">Syncing...</span>
+                    <span style="font-size: 13px; font-weight: 400"
+                      >Syncing...</span
+                    >
                   </div>
                   } @else { Admin: Last Synced:
                   {{statusDetail.integration.connectedAt |
@@ -81,7 +83,7 @@
       @if(statusDetail && statusDetail.connected) {
       <div class="col-12 col-md-12 mt-2">
         <mat-card>
-          <mat-card-content><git-repos /></mat-card-content>
+          <mat-card-content><github-collections /></mat-card-content>
         </mat-card>
       </div>
       }
