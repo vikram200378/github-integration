@@ -51,11 +51,9 @@ import { MatButtonModule } from '@angular/material/button';
           <div class="author-info">
           <div class="author-avatar">
             <!-- <img [src]="data.user_avatar_url" alt="User Avatar" class="avatar-img" /> -->
-            <img 
-  [src]="data.author_avatar_url || 'https://via.placeholder.com/100'" 
-  alt="Author Avatar" 
-  class="avatar-img" 
-/>
+            <img [src]="data.author_avatar_url || 'https://via.placeholder.com/100'" alt="Author Avatar" class="avatar-img"
+            
+            />
 
           </div>
             <p><strong>Commit Author:</strong> {{ data.commit_author_name }}</p>

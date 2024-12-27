@@ -58,17 +58,10 @@
     <!-- <ag-grid-angular style="height: 100%" [rowData]="rowData" [columnDefs]="columnDefs"
       [autoGroupColumnDef]="autoGroupColumnDef" [loading]="dataLoading"
       (cellClicked)="openAuthorModal($event)"></ag-grid-angular> -->
-    <ag-grid-angular
-    style="height: 100%"
-    [rowData]="rowData"
-    [columnDefs]="columnDefs"
-    [autoGroupColumnDef]="autoGroupColumnDef"
-    [loading]="dataLoading"
-    [detailCellRenderer]="detailCellRenderer"
-    (cellClicked)="openAuthorModal($event)"
-    [detailCellRendererParams]="detailCellRendererParams"
-    (firstDataRendered)="onFirstDataRendered($event)"
-  ></ag-grid-angular>
+    <ag-grid-angular style="height: 100%" [rowData]="rowData" [columnDefs]="columnDefs"
+      [autoGroupColumnDef]="autoGroupColumnDef" [loading]="dataLoading" [detailCellRenderer]="detailCellRenderer"
+      (cellClicked)="openAuthorModal($event)" [detailCellRendererParams]="detailCellRendererParams"
+      (firstDataRendered)="onFirstDataRendered($event)"></ag-grid-angular>
 
 
 
