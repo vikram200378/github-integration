@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { EntityType, FilterParams, GithubService } from './github.service';
+import { FilterParams, GithubService } from './github.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +11,7 @@ export class GithubStoreService {
   private _filterChange!: BehaviorSubject<boolean>;
   private _filterClean!: BehaviorSubject<boolean>;
 
-  private _entity: EntityType = EntityType.author;
+  private _entity: string = 'author'; // Default to 'author' entity
   private _search: string = '';
 
   constructor() {
@@ -26,6 +26,7 @@ export class GithubStoreService {
   }
 
   public set filterChange(state: boolean) {
+    console.log('filterChange,', state)
     this._filterChange.next(state);
   }
 
@@ -45,8 +46,11 @@ export class GithubStoreService {
     return this._entity;
   }
 
-  public set entity(value: EntityType) {
-    this._entity = value;
+  public set entity(value: string) {
+    this._entity = value; // Set the selected entity type (e.g., 'author', 'repository')
+    console.log( this._entity,' this._entity this._entity this._entity this._entity')
+
+
     this.filterChange = true;
   }
 
@@ -56,19 +60,38 @@ export class GithubStoreService {
 
   public set search(value: string) {
     this._search = value;
+     console.log(this._search,'_search_search_search_search')
     this.filterChange = true;
   }
 
   public defaultValues() {
-    this._entity = EntityType.author;
+    this._entity = 'author'; // Default to 'author'
     this._search = '';
   }
 
-  public getEndpoint(params: FilterParams) {
+  // Method to get data based on search or entity
+  // public getEndpoint(params: FilterParams): Observable<any> {
+
+  //   if (params?.search) {
+  //     // If search is provided, call global search
+  //     return this._githubService.getSearch(params);
+  //   } else {
+  //     console.log('Calling getEndpointBasedOnEntity');
+  //     // Otherwise, call dynamic API based on the selected entity
+  //     return this._githubService.getEndpointBasedOnEntity(this.entity, params);
+  //   }
+  // }
+
+  public getEndpoint(params: FilterParams): Observable<any> {
+    console.log('Fetching data for entity:', this._entity); // Log the entity
     if (params?.search) {
+      // If search is provided, call global search
       return this._githubService.getSearch(params);
     } else {
+      console.log('Calling getEndpointBasedOnEntity');
+      // Otherwise, call dynamic API based on the selected entity
       return this._githubService.getEndpointBasedOnEntity(this.entity, params);
     }
   }
+  
 }

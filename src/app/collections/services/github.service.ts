@@ -1,21 +1,9 @@
-import { HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { delay, map, Observable, of } from 'rxjs';
 import { GenericClientService } from 'src/shared/services/generic';
-import {
-  getAuthorsData,
-  getCommitList,
-  getEntities,
-  getIssuesList,
-  getOrganisation,
-  getPRList,
-  getRepositoriesList,
-  getSearchResult,
-} from '../mock';
-import {
-  EntitiesResponse,
-  Entity,
-} from 'src/shared/interfaces/github/entities.interface';
+import { getEntities, getSearchResult } from '../mock'; // Mock data if needed
+import { EntitiesResponse, Entity } from 'src/shared/interfaces/github/entities.interface';
 
 export interface FilterParams {
   page: number;
@@ -24,32 +12,14 @@ export interface FilterParams {
   type?: string;
 }
 
-export enum EntityType {
-  organisation = 1,
-  author = 2,
-  repository = 3,
-  pullRequest = 4,
-  commit = 5,
-  issue = 6,
-}
-
-export enum CollectionType {
-  commits = 'commits',
-  pullRequests = 'pullRequests',
-  issues = 'issues',
-  repositories = 'repositories',
-  authors = 'authors',
-  organisation = 'organisation',
-}
-
 @Injectable({
   providedIn: 'root',
 })
 export class GithubService {
-  // Generic Client
   private readonly _genericClient = inject(GenericClientService);
+  private readonly httpClient = inject(HttpClient); // Inject HttpClient to make HTTP requests
 
-  // Get entities
+  // Get entities (mocked data for demonstration)
   public getEntities(): Observable<Entity[]> {
     return of(getEntities() as unknown as EntitiesResponse)?.pipe(
       delay(2000),
@@ -57,102 +27,49 @@ export class GithubService {
     );
   }
 
-  // Get Authors
-  public getAuthors(params: FilterParams) {
-    let httpParams = new HttpParams()
-      ?.set('page', params?.page || 1)
-      ?.set('limit', params?.limit || 10);
+  // Global search based on search term and other filters
+  public getSearch(params: FilterParams): Observable<any> {
+    const apiUrl = `https://api.github.com/search`; // Replace with actual search API base URL
 
-    if (params?.type) {
-      httpParams = httpParams.append('type', params?.type);
+    // Prepare query parameters for search
+    let httpParams = new HttpParams()
+      .set('page', params.page.toString())
+      .set('limit', params.limit.toString());
+
+    if (params.search) {
+      httpParams = httpParams.set('query', params.search); // Search term
     }
 
-    return of(getAuthorsData())?.pipe(delay(2000));
-  }
-
-  // Get Organisation
-  public getOrganisation(params: FilterParams) {
-    let httpParams = new HttpParams()
-      ?.set('page', params?.page || 1)
-      ?.set('limit', params?.limit || 10);
-
-    if (params?.type) {
-      httpParams = httpParams.append('type', params?.type);
+    if (params.type) {
+      httpParams = httpParams.set('type', params.type); // Filter type (optional)
     }
-    return of(getOrganisation())?.pipe(delay(2000));
+
+    // Make the HTTP request to the global search endpoint
+    return this.httpClient.get(apiUrl, { params: httpParams }).pipe(
+      delay(2000), // Simulate delay for demo purposes (can be removed)
+      map((response) => response) // Process the response if needed
+    );
   }
 
-  // Get Pull Requests
-  public getPullRequests(params: FilterParams) {
+  // Dynamic API call based on the selected entity and params (can be kept for other future dynamic use)
+  public getEndpointBasedOnEntity(entityName: string, params: FilterParams): Observable<any> {
+     console.log(entityName,'entityNameentityNameentityName')
+    const apiUrl = `https://api.github.com/${entityName}`; // Replace with actual base API URL
+
+    // Prepare query parameters
     let httpParams = new HttpParams()
-      ?.set('page', params?.page || 1)
-      ?.set('limit', params?.limit || 10);
+      .set('page', params.page.toString())
+      .set('limit', params.limit.toString());
 
-    if (params?.type) {
-      httpParams = httpParams.append('type', params?.type);
+    if (params.search) {
+      httpParams = httpParams.set('search', params.search);
     }
-    return of(getPRList())?.pipe(delay(2000));
-  }
 
-  // Get Commits
-  public getCommits(params: FilterParams) {
-    let httpParams = new HttpParams()
-      ?.set('page', params?.page || 1)
-      ?.set('limit', params?.limit || 10);
-
-    if (params?.type) {
-      httpParams = httpParams.append('type', params?.type);
+    if (params.type) {
+      httpParams = httpParams.set('type', params.type);
     }
-    return of(getCommitList())?.pipe(delay(2000));
-  }
 
-  // Get issues
-  public getIssues(params: FilterParams) {
-    let httpParams = new HttpParams()
-      ?.set('page', params?.page || 1)
-      ?.set('limit', params?.limit || 10);
-
-    if (params?.type) {
-      httpParams = httpParams.append('type', params?.type);
-    }
-    return of(getIssuesList())?.pipe(delay(2000));
-  }
-
-  // Get Repositories
-  public getRepositories(params: FilterParams) {
-    let httpParams = new HttpParams()
-      ?.set('page', params?.page || 1)
-      ?.set('limit', params?.limit || 10);
-
-    if (params?.type) {
-      httpParams = httpParams.append('type', params?.type);
-    }
-    return of(getRepositoriesList())?.pipe(delay(2000));
-  }
-
-  // Get search
-  public getSearch(params: FilterParams) {
-    let httpParams = new HttpParams()
-      ?.set('page', params?.page || 1)
-      ?.set('limit', params?.limit || 10);
-
-    if (params?.search) {
-      httpParams = httpParams.append('query', params?.search || '');
-    }
-    return of(getSearchResult())?.pipe(delay(2000));
-  }
-
-  public getEndpointBasedOnEntity(entityId: EntityType, params: FilterParams) {
-    return entityId == EntityType.organisation
-      ? this.getOrganisation(params)
-      : entityId == EntityType.repository
-      ? this.getRepositories(params)
-      : entityId == EntityType.pullRequest
-      ? this.getOrganisation(params)
-      : entityId == EntityType.issue
-      ? this.getIssues(params)
-      : entityId == EntityType.author
-      ? this.getAuthors(params)
-      : this.getAuthors(params);
+    // Make the HTTP request to the dynamic endpoint
+    return this._genericClient.genericGet(apiUrl, { params: httpParams });
   }
 }

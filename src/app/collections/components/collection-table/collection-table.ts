@@ -32,6 +32,7 @@ export class CollectionTableComponent {
   @Output() paginationChanged = new EventEmitter<{
     page: number;
     limit: number;
+    type: any;
   }>();
 
   public readonly statics = TableStatic;
@@ -43,10 +44,11 @@ export class CollectionTableComponent {
   public handlePageEvent(e: PageEvent) {
     const page = (e.pageIndex || 0) + 1;
     const limit = e.pageSize || 10;
-
+    const type = this.label;
     this.paginationChanged.emit({
       page,
       limit,
+      type,
     });
   }
 }

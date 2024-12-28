@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { MatFormField } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { EntityType, GithubService } from '../services';
+import { GithubService } from '../services';
 
 @Component({
   selector: 'github-entity-dropdown',
@@ -11,7 +11,7 @@ import { EntityType, GithubService } from '../services';
     <mat-form-field [appearance]="'outline'">
       <mat-select [(ngModel)]="entity" (ngModelChange)="handleEntityChange()">
         @for (entity of entities(); track entity._id) {
-        <mat-option [value]="entity?._id">
+        <mat-option [value]="entity?.type">
           {{ entity?.Label }}
         </mat-option>
         }
@@ -21,7 +21,7 @@ import { EntityType, GithubService } from '../services';
   imports: [MatFormField, MatSelectModule, FormsModule],
 })
 export class EntityDropdown {
-  @Output() valueChanged = new EventEmitter<EntityType>();
+  @Output() valueChanged = new EventEmitter<any>();
 
   private readonly _githubService = inject(GithubService);
 
@@ -29,13 +29,14 @@ export class EntityDropdown {
 
   constructor() {
     effect(() => {
-      this.entity = this.entities()?.[0]?._id as unknown as EntityType;
+      this.entity = this.entities()?.[0]?._id as unknown as any;
     });
   }
 
-  public entity!: EntityType;
+  public entity!: any;
 
   public handleEntityChange() {
+    console.log(this.entity,'this.entitythis.entitythis.entitythis.entity')
     this.valueChanged.emit(this.entity);
   }
 }
