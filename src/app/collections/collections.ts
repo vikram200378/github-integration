@@ -5,11 +5,20 @@ import {
   CollectionTableComponent,
 } from './components';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { switchMap } from 'rxjs';
 import { Pagination } from 'src/shared/interfaces';
 import { flattenData, generateDynamicColumns } from './helpers';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
+import {
+  catchError,
+  EMPTY,
+  interval,
+  map,
+  Observable,
+  of,
+  switchMap,
+  throwError,
+} from 'rxjs';
 
 const PaginationStatic = {
   page: 1,
@@ -25,7 +34,7 @@ const PaginationStatic = {
     CollectionsFilterComponent,
     CollectionTableComponent,
     MatCardModule,
-    CommonModule
+    CommonModule,
   ],
   templateUrl: './collections.html',
   styleUrl: './collections.scss',
@@ -36,6 +45,7 @@ export class CollectionsComponent {
   private readonly _githubService = inject(GithubService);
 
   private readonly _destroyRef = inject(DestroyRef);
+
   public tableConfigs: { [key: string]: any } = {};
 
   public pagination: Pagination = {
@@ -91,31 +101,36 @@ export class CollectionsComponent {
     this.fetchData();
   }
 
-  public onPaginationChanged(event: { page: number; limit: number; type: any }) {
+  public onPaginationChanged(event: {
+    page: number;
+    limit: number;
+    type: any;
+  }) {
     const { page, limit, type } = event;
     this.pagination.page = page;
     this.pagination.limit = limit;
     this.type = type;
     this.fetchData();
   }
-  
+
   public fetchData() {
     this._githubStoreService.filterChange
       .pipe(
-        takeUntilDestroyed(this._destroyRef),
-        switchMap(() => {
-          console.log('Fetching data based on entity:', this._githubStoreService.entity);
-          const params: FilterParams = {
-            search: this._githubStoreService.search,
-            page: 0,
-            limit: 0
-          };
-          return this._githubStoreService.getEndpoint(params);
+        switchMap((state) =>
+          state
+            ? this._githubStoreService.getEndpoint({
+                search: this._githubStoreService.search,
+                page: 0,
+                limit: 0,
+              })
+            : EMPTY
+        ),
+        catchError((err) => {
+          return throwError(() => err);
         })
       )
       .subscribe({
         next: (response: any) => {
-           console.log(response,'responseresponseresponse')
           this.tableConfigs = {}; // Reset table configs
           for (const [key, value] of Object.entries(response)) {
             if (
@@ -148,7 +163,8 @@ export class CollectionsComponent {
         error: (err) => {
           this.loading = false;
           this.error =
-            err?.error?.message || 'Unable to process your request to fetch data';
+            err?.error?.message ||
+            'Unable to process your request to fetch data';
           console.error(err?.error?.message);
         },
       });

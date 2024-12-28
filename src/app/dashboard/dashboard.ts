@@ -77,7 +77,7 @@ export class DashboardComponent implements OnInit {
 
   public getStatus() {
     this.syncLoader = true;
-    interval(2000)
+    interval(100000)
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         switchMap(() => this._dashboardService.status()),
