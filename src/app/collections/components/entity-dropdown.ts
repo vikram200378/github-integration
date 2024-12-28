@@ -36,7 +36,6 @@ export class EntityDropdown {
   public entity!: any;
 
   public handleEntityChange() {
-    console.log(this.entity,'this.entitythis.entitythis.entitythis.entity')
     this.valueChanged.emit(this.entity);
   }
 }

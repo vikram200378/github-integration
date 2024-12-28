@@ -1,10 +1,10 @@
 import { MatInputModule } from '@angular/material/input';
-import { ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { EntityDropdown } from '../entity-dropdown';
-import { FilterParams, GithubStoreService } from '../../services';
+import { GithubStoreService } from '../../services';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -36,24 +36,7 @@ export class CollectionsFilterComponent {
   // Search
   public search: string = '';
 
-  constructor(private cdr: ChangeDetectorRef) {
-
-    // this._githubService.filterChange
-    // .pipe(takeUntilDestroyed(this._destroyRef))
-    // .subscribe((state) => {
-    //   if (state) {
-    //     const params: FilterParams = {
-    //       page: 1,
-    //       limit: 10,
-    //       search: this.search,
-    //     };
-    //     this._githubService.getEndpoint(params).subscribe(response => {
-    //       console.log('Data fetched:', response);
-    //     });
-    //   }
-    // });
-
-
+  constructor() {
     // Reset filter values
     this._githubService.filterClean
       ?.pipe(takeUntilDestroyed(this._destroyRef))
@@ -73,11 +56,8 @@ export class CollectionsFilterComponent {
 
   // Entity filter changed
   public entityChanged(value: any) {
-     console.log(value,'valuevaluevalue-changes')
     this.selectedEntity = value;
-  
     this._githubService.entity = value || '';
-    this.cdr.detectChanges();
   }
 
   // Search changed

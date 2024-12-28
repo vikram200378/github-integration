@@ -15,7 +15,7 @@ export class GithubStoreService {
   private _search: string = '';
 
   constructor() {
-    this._filterChange = new BehaviorSubject<boolean>(true);
+    this._filterChange = new BehaviorSubject<boolean>(false);
     this._filterClean = new BehaviorSubject<boolean>(true);
 
     this.defaultValues();
@@ -26,7 +26,6 @@ export class GithubStoreService {
   }
 
   public set filterChange(state: boolean) {
-    console.log('filterChange,', state)
     this._filterChange.next(state);
   }
 
@@ -48,9 +47,6 @@ export class GithubStoreService {
 
   public set entity(value: string) {
     this._entity = value; // Set the selected entity type (e.g., 'author', 'repository')
-    console.log( this._entity,' this._entity this._entity this._entity this._entity')
-
-
     this.filterChange = true;
   }
 
@@ -60,7 +56,6 @@ export class GithubStoreService {
 
   public set search(value: string) {
     this._search = value;
-     console.log(this._search,'_search_search_search_search')
     this.filterChange = true;
   }
 
@@ -70,28 +65,13 @@ export class GithubStoreService {
   }
 
   // Method to get data based on search or entity
-  // public getEndpoint(params: FilterParams): Observable<any> {
-
-  //   if (params?.search) {
-  //     // If search is provided, call global search
-  //     return this._githubService.getSearch(params);
-  //   } else {
-  //     console.log('Calling getEndpointBasedOnEntity');
-  //     // Otherwise, call dynamic API based on the selected entity
-  //     return this._githubService.getEndpointBasedOnEntity(this.entity, params);
-  //   }
-  // }
-
   public getEndpoint(params: FilterParams): Observable<any> {
-    console.log('Fetching data for entity:', this._entity); // Log the entity
     if (params?.search) {
       // If search is provided, call global search
       return this._githubService.getSearch(params);
     } else {
-      console.log('Calling getEndpointBasedOnEntity');
       // Otherwise, call dynamic API based on the selected entity
       return this._githubService.getEndpointBasedOnEntity(this.entity, params);
     }
   }
-  
 }

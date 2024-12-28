@@ -3,7 +3,10 @@ import { inject, Injectable } from '@angular/core';
 import { delay, map, Observable, of } from 'rxjs';
 import { GenericClientService } from 'src/shared/services/generic';
 import { getEntities, getSearchResult } from '../mock'; // Mock data if needed
-import { EntitiesResponse, Entity } from 'src/shared/interfaces/github/entities.interface';
+import {
+  EntitiesResponse,
+  Entity,
+} from 'src/shared/interfaces/github/entities.interface';
 
 export interface FilterParams {
   page: number;
@@ -52,8 +55,10 @@ export class GithubService {
   }
 
   // Dynamic API call based on the selected entity and params (can be kept for other future dynamic use)
-  public getEndpointBasedOnEntity(entityName: string, params: FilterParams): Observable<any> {
-     console.log(entityName,'entityNameentityNameentityName')
+  public getEndpointBasedOnEntity(
+    entityName: string,
+    params: FilterParams
+  ): Observable<any> {
     const apiUrl = `https://api.github.com/${entityName}`; // Replace with actual base API URL
 
     // Prepare query parameters
