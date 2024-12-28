@@ -18,18 +18,18 @@ export interface FilterParams {
 export class GithubService {
   private readonly _genericClient = inject(GenericClientService);
   private readonly httpClient = inject(HttpClient); // Inject HttpClient to make HTTP requests
-
+  public APi_url = 'http://localhost:3000/github/'
   // Get entities (mocked data for demonstration)
   public getEntities(): Observable<Entity[]> {
-    return of(getEntities() as unknown as EntitiesResponse)?.pipe(
+    return this._genericClient.genericGet<{ results: Entity[] }>(this.APi_url + 'entity')?.pipe(
       delay(2000),
-      map((res) => (res?.results?.length ? res?.results : []))
+      map((res) => (res?.results?.length ? res.results : []))
     );
   }
-
+  
   // Global search based on search term and other filters
   public getSearch(params: FilterParams): Observable<any> {
-    const apiUrl = `https://api.github.com/search`; // Replace with actual search API base URL
+    const apiUrl = `${this.APi_url}/search`; // Replace with actual search API base URL
 
     // Prepare query parameters for search
     let httpParams = new HttpParams()
@@ -54,7 +54,7 @@ export class GithubService {
   // Dynamic API call based on the selected entity and params (can be kept for other future dynamic use)
   public getEndpointBasedOnEntity(entityName: string, params: FilterParams): Observable<any> {
      console.log(entityName,'entityNameentityNameentityName')
-    const apiUrl = `https://api.github.com/${entityName}`; // Replace with actual base API URL
+    const apiUrl =  `${this.APi_url}${entityName}`; // Replace with actual base API URL
 
     // Prepare query parameters
     let httpParams = new HttpParams()

@@ -10,9 +10,9 @@ import { GithubService } from '../services';
   template: ` <label for="entity" class="field-label">Entity:</label>
     <mat-form-field [appearance]="'outline'">
       <mat-select [(ngModel)]="entity" (ngModelChange)="handleEntityChange()">
-        @for (entity of entities(); track entity._id) {
+        @for (entity of entities(); track entity) {
         <mat-option [value]="entity?.type">
-          {{ entity?.Label }}
+          {{ entity?.label }}
         </mat-option>
         }
       </mat-select>
@@ -29,7 +29,8 @@ export class EntityDropdown {
 
   constructor() {
     effect(() => {
-      this.entity = this.entities()?.[0]?._id as unknown as any;
+      this.entity = this.entities();
+      console.log('Entities data:', this.entity);
     });
   }
 
