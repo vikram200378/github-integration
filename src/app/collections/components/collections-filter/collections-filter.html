@@ -1,13 +1,8 @@
 <div class="row">
   <div class="col-12 col-md-4 form-field-container">
-    <label for="activeIntegration" class="field-label"
-      >Active Integration:</label
-    >
+    <label for="activeIntegration" class="field-label">Active Integration:</label>
     <mat-form-field [appearance]="'outline'">
-      <mat-select
-        [(ngModel)]="activeIntegration"
-        (ngModelChange)="activeIntegrationChanged()"
-      >
+      <mat-select [(ngModel)]="activeIntegration" (ngModelChange)="activeIntegrationChanged()">
         <mat-option value="github">Github</mat-option>
       </mat-select>
     </mat-form-field>
@@ -20,13 +15,7 @@
   <div class="col-12 col-md-4 form-field-container">
     <label for="search" class="field-label">Search:</label>
     <mat-form-field [appearance]="'outline'">
-      <input
-        matInput
-        type="text"
-        placeholder="Search"
-        [(ngModel)]="search"
-        (ngModelChange)="searchChanged()"
-      />
+      <input matInput type="text" placeholder="Search" [(ngModel)]="search" (ngModelChange)="searchChanged()" />
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
   </div>
