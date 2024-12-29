@@ -31,9 +31,13 @@ export class EntityDropdown {
   public entities = toSignal(this._githubService.getEntities());
 
   constructor() {
-    effect(() => {
-      this.entity = this.entities();
-    });
+    const initialEntities:any = this.entities();
+    if (initialEntities?.length > 0) {
+      this.entity = initialEntities[0].type; // Set default entity if needed
+    }
+    // effect(() => {
+    //   this.entity = this.entities();
+    // });
   }
 
   public entity!: any;

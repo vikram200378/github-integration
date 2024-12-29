@@ -87,6 +87,7 @@ export function generateDynamicColumns(firstRow: any): any[] {
         filter: true,
         sortable: true,
         flex: 1,
+        minWidth:200
       } as ColDef;
     }
 
@@ -96,6 +97,7 @@ export function generateDynamicColumns(firstRow: any): any[] {
       filter: true,
       sortable: true,
       flex: 1,
+      minWidth:200
     };
   });
 

@@ -7,17 +7,16 @@ import { FilterParams, GithubService } from './github.service';
 })
 export class GithubStoreService {
   private readonly _githubService = inject(GithubService);
-
   private _filterChange!: BehaviorSubject<boolean>;
   private _filterClean!: BehaviorSubject<boolean>;
 
-  private _entity: string = 'author'; // Default to 'author' entity
+  private _entity: string = 'author';
   private _search: string = '';
+  private _type: string = '';
 
   constructor() {
     this._filterChange = new BehaviorSubject<boolean>(false);
     this._filterClean = new BehaviorSubject<boolean>(true);
-
     this.defaultValues();
   }
 
@@ -37,8 +36,16 @@ export class GithubStoreService {
     if (state) {
       this.defaultValues();
     }
-
     this._filterClean.next(state);
+  }
+
+  public get type() {
+    return this._type;
+  }
+
+  public set type(value: string) {
+    this._type = value;
+    this.filterChange = true;
   }
 
   public get entity() {
@@ -46,7 +53,8 @@ export class GithubStoreService {
   }
 
   public set entity(value: string) {
-    this._entity = value; // Set the selected entity type (e.g., 'author', 'repository')
+    this._type = ''
+    this._entity = value;
     this.filterChange = true;
   }
 
@@ -62,6 +70,7 @@ export class GithubStoreService {
   public defaultValues() {
     this._entity = 'author'; // Default to 'author'
     this._search = '';
+    this._type = '';
   }
 
   // Method to get data based on search or entity
